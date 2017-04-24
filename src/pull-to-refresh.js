@@ -51,7 +51,7 @@ class PullToRefresh extends Component {
     const { scroll, acceptThreshold } = this.props;
     if (scroll.getDistanceToStart() <= acceptThreshold) {
       documentElement.addEventListener('touchmove', this.handleTouchMove, true);
-      documentElement.addEventListener('touchend', this.handleTouchEnd);
+      documentElement.addEventListener('touchend', this.handleTouchEnd, true);
       this.setState({
         initTouchY: evt.touches[0].clientY,
         transition: undefined,
@@ -71,9 +71,11 @@ class PullToRefresh extends Component {
       this.setState({
         accepted: true,
       });
+      evt.preventDefault();
+      global.document.body.style.overflowScrolling = 'auto';
+      global.document.body.style.WebkitOverflowScrolling = 'auto';
     }
     if (this.state.accepted) {
-      evt.preventDefault();
       this.setState({
         height,
         transition: undefined,
@@ -87,6 +89,8 @@ class PullToRefresh extends Component {
     const { onRefresh } = this.props;
     documentElement.removeEventListener('touchmove', this.handleTouchMove);
     documentElement.removeEventListener('touchend', this.handleTouchEnd);
+    global.document.body.style.overflowScrolling = undefined;
+    global.document.body.style.WebkitOverflowScrolling = undefined;
     this.setState({
       height: 0,
       transition: '0.5s height',

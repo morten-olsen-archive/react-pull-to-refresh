@@ -20150,7 +20150,7 @@ var PullToRefresh = function (_Component) {
 
       if (scroll.getDistanceToStart() <= acceptThreshold) {
         documentElement.addEventListener('touchmove', this.handleTouchMove, true);
-        documentElement.addEventListener('touchend', this.handleTouchEnd);
+        documentElement.addEventListener('touchend', this.handleTouchEnd, true);
         this.setState({
           initTouchY: evt.touches[0].clientY,
           transition: undefined,
@@ -20176,9 +20176,11 @@ var PullToRefresh = function (_Component) {
         this.setState({
           accepted: true
         });
+        evt.preventDefault();
+        global.document.body.style.overflowScrolling = 'auto';
+        global.document.body.style.WebkitOverflowScrolling = 'auto';
       }
       if (this.state.accepted) {
-        evt.preventDefault();
         this.setState({
           height: height,
           transition: undefined,
@@ -20194,6 +20196,8 @@ var PullToRefresh = function (_Component) {
 
       documentElement.removeEventListener('touchmove', this.handleTouchMove);
       documentElement.removeEventListener('touchend', this.handleTouchEnd);
+      global.document.body.style.overflowScrolling = undefined;
+      global.document.body.style.WebkitOverflowScrolling = undefined;
       this.setState({
         height: 0,
         transition: '0.5s height'
@@ -20295,10 +20299,22 @@ var renderItem = function renderItem(item, i) {
   );
 };
 
-var Wrapper = function Wrapper() {
+var Wrapper = (0, _reactScrollView.createScrollContainer)({ reverse: true })(function () {
   return _react2.default.createElement(
     'div',
-    null,
+    {
+      style: {
+        position: 'fixed',
+        left: 0,
+        top: 40,
+        right: 0,
+        bottom: 0,
+        overflowY: 'scroll',
+        overflowScrolling: 'touch',
+        WebkitOverflowScrolling: 'touch'
+      }
+    },
+    items.map(renderItem),
     _react2.default.createElement(_pullToRefresh2.default, {
       render: function render(_ref) {
         var drag = _ref.drag;
@@ -20312,10 +20328,9 @@ var Wrapper = function Wrapper() {
       onRefresh: function onRefresh() {
         console.log('should refresh');
       }
-    }),
-    items.map(renderItem)
+    })
   );
-};
+});
 
 _reactDom2.default.render(_react2.default.createElement(Wrapper, null), global.document.getElementById('root'));
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(49)))

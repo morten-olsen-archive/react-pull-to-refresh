@@ -15,26 +15,16 @@ const renderItem = (item, i) => (
   </div>
 );
 
-const Wrapper = createScrollContainer({ reverse: true })(() => (
-  <div
-    style={{
-      position: 'fixed',
-      left: 0,
-      top: 40,
-      right: 0,
-      bottom: 0,
-      overflowY: 'scroll',
-      overflowScrolling: 'touch',
-      WebkitOverflowScrolling: 'touch',
-    }}
-  >
-    {items.map(renderItem)}
+const Wrapper = () => (
+  <div>
     <PullToRefresh
       render={({ drag }) => <div>pull: {drag}</div>}
       onRefresh={() => { console.log('should refresh'); }}
     />
+    {items.map(renderItem)}
+
   </div>
-));
+);
 
 ReactDOM.render(
   <Wrapper />,

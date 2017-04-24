@@ -13387,7 +13387,9 @@ windowApi.addEventListener('scroll', handleAtEnd);
 
 exports.default = windowApi.getPublicApi({
   scrollToStart: windowApi.scrollToTop,
-  scrollToEnd: windowApi.scrollToBottom
+  scrollToEnd: windowApi.scrollToBottom,
+  getDistanceToStart: windowApi.getDistanceToTop,
+  getDistanceToEnd: windowApi.getDistanceToBottom
 });
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(49)))
 
@@ -20293,22 +20295,10 @@ var renderItem = function renderItem(item, i) {
   );
 };
 
-var Wrapper = (0, _reactScrollView.createScrollContainer)({ reverse: true })(function () {
+var Wrapper = function Wrapper() {
   return _react2.default.createElement(
     'div',
-    {
-      style: {
-        position: 'fixed',
-        left: 0,
-        top: 40,
-        right: 0,
-        bottom: 0,
-        overflowY: 'scroll',
-        overflowScrolling: 'touch',
-        WebkitOverflowScrolling: 'touch'
-      }
-    },
-    items.map(renderItem),
+    null,
     _react2.default.createElement(_pullToRefresh2.default, {
       render: function render(_ref) {
         var drag = _ref.drag;
@@ -20322,9 +20312,10 @@ var Wrapper = (0, _reactScrollView.createScrollContainer)({ reverse: true })(fun
       onRefresh: function onRefresh() {
         console.log('should refresh');
       }
-    })
+    }),
+    items.map(renderItem)
   );
-});
+};
 
 _reactDom2.default.render(_react2.default.createElement(Wrapper, null), global.document.getElementById('root'));
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(49)))

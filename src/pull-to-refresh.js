@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { withScrollApi, scrollApiPropType } from 'react-scroll-view';
 
-const documentElement = global.document.documentElement;
+const documentElement = global.document ? global.document.documentElement : null;
 
 class PullToRefresh extends Component {
   static get propTypes() {
@@ -49,7 +49,7 @@ class PullToRefresh extends Component {
 
   handleTouchStart(evt) {
     const { scroll, acceptThreshold } = this.props;
-    if (scroll.getDistanceToStart() <= acceptThreshold) {
+    if (scroll.getDistanceToStart() <= acceptThreshold + 1) {
       documentElement.addEventListener('touchmove', this.handleTouchMove, true);
       documentElement.addEventListener('touchend', this.handleTouchEnd, true);
       this.setState({
@@ -61,7 +61,7 @@ class PullToRefresh extends Component {
   }
 
   handleTouchMove(evt) {
-    const { acceptThreshold, maxPull, resistance, refreshThreshold } = this.props;
+    const { acceptThreshold, maxPull, resistance, refreshThreshold, scroll } = this.props;
     const { initTouchY, accepted } = this.state;
     const dragDistance = this.reversable(evt.touches[0].clientY - initTouchY);
     const height = maxPull
@@ -71,11 +71,12 @@ class PullToRefresh extends Component {
       this.setState({
         accepted: true,
       });
-      evt.preventDefault();
+      scroll.disableScroll();
       global.document.body.style.overflowScrolling = 'auto';
       global.document.body.style.WebkitOverflowScrolling = 'auto';
     }
     if (this.state.accepted) {
+      evt.preventDefault();
       this.setState({
         height,
         transition: undefined,
@@ -86,12 +87,15 @@ class PullToRefresh extends Component {
 
   handleTouchEnd() {
     const { willRefresh } = this.state;
-    const { onRefresh } = this.props;
+    const { onRefresh, scroll } = this.props;
     documentElement.removeEventListener('touchmove', this.handleTouchMove);
     documentElement.removeEventListener('touchend', this.handleTouchEnd);
     global.document.body.style.overflowScrolling = undefined;
     global.document.body.style.WebkitOverflowScrolling = undefined;
+    scroll.enableScroll();
     this.setState({
+      initTouchY: undefined,
+      accepted: false,
       height: 0,
       transition: '0.5s height',
     });
@@ -110,6 +114,7 @@ class PullToRefresh extends Component {
           height,
           overflow: 'hidden',
           position: 'relative',
+          width: '100%',
           transition,
         }}
       >
